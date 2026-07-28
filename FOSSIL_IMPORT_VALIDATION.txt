@@ -1,0 +1,8 @@
+Fossil records imported: 174
+Fossil photographs imported: 100
+Fossils with photographs: 99
+Fossils without photographs: 75
+Number range: F-001 through F-174
+Numbering gaps: none
+Duplicate record numbers: none
+Photo numbers outside catalog: none
