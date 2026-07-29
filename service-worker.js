@@ -1,4 +1,4 @@
-const CACHE='legacy-in-stone-v0.6.2-core';
+const CACHE='legacy-in-stone-v0.6.3-media-retry';
 const CORE=['./','./index.html','./styles.css','./specimens-data.js','./materials-data.js','./media-manifest.js','./app.js','./storage.js','./cloud-config.js','./cloud.js','./v06-enhancements.js','./manifest.webmanifest'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));

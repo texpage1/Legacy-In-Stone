@@ -8,7 +8,7 @@ function clearMessage(){const m=$('#cloudMessage');m.textContent='';m.classList.
 function setBusy(btn,busy,label){btn.disabled=busy;if(label)btn.textContent=busy?label:btn.dataset.label;}
 function download(name,blob){const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1000)}
 function blobToDataUrl(blob){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>reject(r.error);r.readAsDataURL(blob);});}
-async function backup(){const attachments=await LISStorage.allAttachments(),encoded=[];for(const a of attachments)encoded.push({...a,file:await blobToDataUrl(a.file)});const payload={version:'0.6.2',createdAt:new Date().toISOString(),records:JSON.parse(localStorage.getItem('lis-v04-records')||'{}'),added:JSON.parse(localStorage.getItem('lis-v04-added')||'[]'),attachments:encoded};download(`Legacy_in_Stone_Full_Backup_${new Date().toISOString().slice(0,10)}.json`,new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}));toast('Full application backup exported.','success');}
+async function backup(){const attachments=await LISStorage.allAttachments(),encoded=[];for(const a of attachments)encoded.push({...a,file:await blobToDataUrl(a.file)});const payload={version:'0.6.3',createdAt:new Date().toISOString(),records:JSON.parse(localStorage.getItem('lis-v04-records')||'{}'),added:JSON.parse(localStorage.getItem('lis-v04-added')||'[]'),attachments:encoded};download(`Legacy_in_Stone_Full_Backup_${new Date().toISOString().slice(0,10)}.json`,new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}));toast('Full application backup exported.','success');}
 function specimenById(id){return (LISApp?.getRecords?.()||[]).find(x=>Number(x.id)===Number(id));}
 async function saveAttachment(e){e.preventDefault();const f=new FormData(e.target),file=(f.get('camera_file')&&f.get('camera_file').name)?f.get('camera_file'):f.get('file'),specimen=specimenById(f.get('id'));if(!file||!file.name){toast('Choose a file first.','error');return;}const submit=e.target.querySelector('[type=submit]');submit.disabled=true;try{await LISStorage.saveAttachment({specimenId:Number(f.get('id')),specimenCode:specimen?.specimen_code,type:f.get('material_type'),caption:String(f.get('caption')||''),name:file.name,mime:file.type,size:file.size,file});if(LISCloud.signedIn())await LISCloud.uploadAttachment({file,specimenCode:specimen?.specimen_code,type:f.get('material_type'),caption:String(f.get('caption')||'')});$('#attachmentDialog').close();toast(`${f.get('material_type')} saved${LISCloud.signedIn()?' to the private cloud':' on this device'}.`,'success');renderLocalMaterials(Number(f.get('id')));}catch(err){toast('File save failed: '+err.message,'error');}finally{submit.disabled=false;}}
 async function renderLocalMaterials(id){if(!id)return;const host=$('#detailBody .detail-content section:last-child');if(!host)return;host.querySelectorAll('.local-materials,.cloud-materials').forEach(x=>x.remove());const local=await LISStorage.listAttachments(id);if(local.length){const wrap=document.createElement('div');wrap.className='materials-list local-materials';wrap.innerHTML=local.map(a=>`<button class="material-item local-attachment"><span class="material-type">${esc(a.type)}</span><strong>${esc(a.name)}</strong><small>${esc(a.caption||'Open saved file')}</small></button>`).join('');host.appendChild(wrap);wrap.querySelectorAll('button').forEach((b,i)=>b.onclick=()=>{const u=URL.createObjectURL(local[i].file);window.open(u,'_blank','noopener');setTimeout(()=>URL.revokeObjectURL(u),60000)});}
@@ -20,7 +20,53 @@ async function loadCloudCatalog(){if(!LISCloud.signedIn())return;try{const recor
 function unlock(){document.body.classList.remove('auth-locked');$('#authGate').classList.add('hidden');}
 function lock(){document.body.classList.add('auth-locked');$('#authGate').classList.remove('hidden');}
 async function authenticate(email,password,sourceForm){const btn=sourceForm.querySelector('[type=submit]');btn.disabled=true;clearMessage();try{await LISCloud.signIn(email,password);refreshStatus();unlock();await loadCloudCatalog();setMessage('Signed in and ready to sync.','success');toast('Signed in successfully.','success');return true;}catch(err){setMessage('Sign-in failed: '+err.message,'error');$('#authError').textContent='Sign-in failed: '+err.message;$('#authError').classList.remove('hidden');return false;}finally{btn.disabled=false;}}
-async function migrateMedia(){const btn=$('#mediaMigration'),progress=$('#migrationProgress'),manifest=window.LEGACY_IN_STONE_MEDIA_MANIFEST||[];if(!manifest.length)return setMessage('No migration manifest was found.','error');btn.disabled=true;let done=0,failed=0;try{const existing=await LISCloud.migratedSourcePaths();for(let i=0;i<manifest.length;i++){const item=manifest[i];if(existing.has(item.path)){done++;continue;}progress.textContent=`Migrating ${i+1} of ${manifest.length}: ${item.path}`;try{const res=await fetch(item.path);if(!res.ok)throw new Error(`HTTP ${res.status}`);const blob=await res.blob(),file=new File([blob],item.path.split('/').pop(),{type:blob.type||'application/octet-stream'});await LISCloud.uploadAttachment({file,specimenCode:item.specimen_code,type:item.type,caption:item.title,sourcePath:item.path});done++;}catch(err){failed++;console.error('Migration failed',item.path,err);}}progress.textContent=`Migration pass complete: ${done} available in private storage; ${failed} failed.`;setMessage(progress.textContent,failed?'error':'success');}catch(err){setMessage('Media migration failed: '+err.message,'error');}finally{btn.disabled=false;}}
+function encodedSourceUrl(path){
+  const encoded=String(path||'').split('/').map(segment=>encodeURIComponent(segment)).join('/');
+  return new URL(encoded,document.baseURI).href;
+}
+function wait(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
+async function fetchLegacyFile(path,attempt=0){
+  const response=await fetch(encodedSourceUrl(path),{cache:'no-store',credentials:'same-origin'});
+  if(response.ok)return response;
+  if((response.status===408||response.status===429||response.status>=500)&&attempt<3){await wait(700*(attempt+1));return fetchLegacyFile(path,attempt+1);}
+  throw new Error(`Source HTTP ${response.status}`);
+}
+async function migrateMedia(){
+  const btn=$('#mediaMigration'),progress=$('#migrationProgress'),manifest=window.LEGACY_IN_STONE_MEDIA_MANIFEST||[];
+  if(!manifest.length)return setMessage('No migration manifest was found.','error');
+  btn.disabled=true;clearMessage();
+  let available=0,uploaded=0,failed=0;const failures=[];
+  try{
+    const existing=await LISCloud.migratedSourcePaths();
+    available=existing.size;
+    for(let i=0;i<manifest.length;i++){
+      const item=manifest[i];
+      if(existing.has(item.path))continue;
+      progress.textContent=`Migrating ${i+1} of ${manifest.length} · ${uploaded} newly stored · ${failed} failed · ${item.path}`;
+      try{
+        const response=await fetchLegacyFile(item.path);
+        const blob=await response.blob();
+        if(!blob.size)throw new Error('Source file was empty.');
+        const fileName=decodeURIComponent(String(item.path).split('/').pop());
+        const file=new File([blob],fileName,{type:blob.type||'application/octet-stream'});
+        await LISCloud.uploadAttachment({file,specimenCode:item.specimen_code,type:item.type,caption:item.title,sourcePath:item.path});
+        uploaded++;existing.add(item.path);
+        if(uploaded%10===0)await wait(250);
+      }catch(err){
+        failed++;failures.push({path:item.path,specimen_code:item.specimen_code,error:String(err?.message||err)});
+        console.error('Migration failed',item.path,err);
+      }
+    }
+    const total=available+uploaded;
+    progress.textContent=`Migration pass complete: ${total} available in private storage; ${failed} failed.`;
+    setMessage(progress.textContent,failed?'error':'success');
+    if(failures.length){
+      const report={version:'0.6.3',createdAt:new Date().toISOString(),availableBeforeRun:available,newlyUploaded:uploaded,failed,failures};
+      download(`Legacy_in_Stone_Media_Migration_Failures_${new Date().toISOString().slice(0,10)}.json`,new Blob([JSON.stringify(report,null,2)],{type:'application/json'}));
+    }
+  }catch(err){setMessage('Media migration failed: '+err.message,'error');}
+  finally{btn.disabled=!LISCloud.signedIn();}
+}
 function setupCloud(){refreshStatus();$('#cloudLoginForm').onsubmit=e=>{e.preventDefault();authenticate(e.target.email.value,e.target.password.value,e.target)};$('#authLoginForm').onsubmit=e=>{e.preventDefault();$('#authError').classList.add('hidden');authenticate(e.target.email.value,e.target.password.value,e.target)};$('#cloudSignOut').onclick=()=>{LISCloud.signOut();refreshStatus();lock();setMessage('Signed out.','success')};$('#cloudPush').dataset.label='Synchronize Catalog';$('#cloudPush').onclick=async()=>{const btn=$('#cloudPush');setBusy(btn,true,'Synchronizing…');clearMessage();try{const records=LISApp.getRecords();await LISCloud.pushCatalog(records);const now=new Date().toISOString();localStorage.setItem('lis-last-sync',now);refreshStatus();setMessage(`${records.length} records synchronized successfully.`,`success`);toast(`${records.length} records synchronized.`,`success`);}catch(err){setMessage('Sync failed: '+err.message,'error');}finally{setBusy(btn,false)}};$('#mediaMigration').onclick=migrateMedia;if(!LISCloud.configured()){unlock();setMessage('Cloud connection is not configured in this copy.','error');}else if(LISCloud.signedIn()){unlock();loadCloudCatalog();}else lock();}
 window.addEventListener('DOMContentLoaded',()=>{$('#attachmentForm').onsubmit=saveAttachment;$('#fullBackup').onclick=backup;$('#settingsButton').onclick=()=>{$('#settingsDialog').showModal();refreshStatus()};observeDetail();setupCloud();if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./service-worker.js');const install=$('#installApp');let deferred;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;install.hidden=false});install.onclick=async()=>{if(deferred){deferred.prompt();await deferred.userChoice;deferred=null;install.hidden=true}else toast('Use your browser’s Add to Home Screen or Install App command.')};});
 })();
