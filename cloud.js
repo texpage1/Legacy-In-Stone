@@ -79,6 +79,14 @@
     const rows=records.map(record=>({owner_id:ownerId,specimen_code:record.specimen_code,payload:record,updated_at:updatedAt}));
     return request('/rest/v1/specimens?on_conflict=owner_id%2Cspecimen_code',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(rows)});
   }
+
+  async function upsertSpecimen(record){
+    await ensureSession();
+    if(!record?.specimen_code) throw new Error('Specimen number is required.');
+    const row={owner_id:session.user.id,specimen_code:record.specimen_code,payload:record,updated_at:new Date().toISOString()};
+    await request('/rest/v1/specimens?on_conflict=owner_id%2Cspecimen_code',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(row)});
+    return record;
+  }
   async function pullCatalog(){
     await ensureSession();
     const rows=await request('/rest/v1/specimens?select=payload&order=specimen_code');
@@ -125,5 +133,5 @@
     const rows=await request('/rest/v1/attachments?select=source_path&source_path=not.is.null');
     return new Set((rows||[]).map(x=>x.source_path));
   }
-  window.LISCloud={configured:()=>Boolean(cfg.enabled&&cfg.supabaseUrl&&cfg.supabaseAnonKey),signedIn:()=>Boolean(session?.access_token),user:()=>session?.user||null,signIn,signOut,refreshSession,pushCatalog,pullCatalog,uploadAttachment,listAttachments,signedUrl,migratedSourcePaths};
+  window.LISCloud={configured:()=>Boolean(cfg.enabled&&cfg.supabaseUrl&&cfg.supabaseAnonKey),signedIn:()=>Boolean(session?.access_token),user:()=>session?.user||null,signIn,signOut,refreshSession,pushCatalog,upsertSpecimen,pullCatalog,uploadAttachment,listAttachments,signedUrl,migratedSourcePaths};
 })();
