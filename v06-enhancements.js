@@ -16,14 +16,75 @@ function photoRows(code){return (bySpecimen.get(code)||[]).filter(a=>a.material_
 function materialRows(code){return (bySpecimen.get(code)||[]).filter(a=>!(a.material_type==='Specimen photograph'||String(a.mime_type||'').startsWith('image/')));}
 function queuePatch(){if(patchQueued)return;patchQueued=true;requestAnimationFrame(()=>{patchQueued=false;patchPrivateMedia();});}
 async function patchCard(card){if(card.dataset.cloudPatched==='loading')return;const code=card.querySelector('.code')?.textContent?.trim(),photo=photoRows(code)[0],box=card.querySelector('.photo');if(!photo||!box)return;card.dataset.cloudPatched='loading';try{box.style.backgroundImage=`url("${await secureUrl(photo,7200)}")`;box.textContent='';card.dataset.cloudPatched='yes';}catch(_){delete card.dataset.cloudPatched;}}
-async function patchDetail(){const body=$('#detailBody'),code=body?.querySelector('.code')?.textContent?.trim();if(!code)return;const photos=photoRows(code),content=body.querySelector('.detail-content');let gallery=body.querySelector('.gallery');if(photos.length){if(!gallery){gallery=document.createElement('div');gallery.className='gallery';body.querySelector('.detail-head')?.insertAdjacentElement('afterend',gallery);}if(gallery.dataset.cloudCode!==code){gallery.dataset.cloudCode=code;gallery.innerHTML='<div class="placeholder">Loading private photographs…</div>';const urls=await Promise.all(photos.map(a=>secureUrl(a,7200).catch(()=>null)));gallery.innerHTML=urls.map((u,i)=>u?`<img src="${esc(u)}" alt="${esc(photos[i].caption||photos[i].file_name)}">`:'').join('')||'<div class="placeholder">Private photographs could not be opened.</div>';}}
-const section=[...body.querySelectorAll('.detail-content section')].find(s=>s.querySelector('h3')?.textContent==='Related materials');if(section){const rows=materialRows(code);section.querySelectorAll('.materials-list,.placeholder').forEach(x=>x.remove());if(!rows.length)section.insertAdjacentHTML('beforeend','<div class="placeholder">No related documents have been added.</div>');else{const wrap=document.createElement('div');wrap.className='materials-list cloud-materials';wrap.innerHTML=rows.map(a=>`<button class="material-item local-attachment"><span class="material-type">${esc(a.material_type)}</span><strong>${esc(a.file_name)}</strong><small>${esc(a.caption||'Open private file')}</small></button>`).join('');section.appendChild(wrap);wrap.querySelectorAll('button').forEach((b,i)=>b.onclick=()=>openPrivateAttachment(rows[i]));}}
+async function patchDetail(){
+  const body=$('#detailBody'),code=body?.querySelector('.code')?.textContent?.trim();
+  if(!code)return;
+
+  const photos=photoRows(code);
+  let gallery=body.querySelector('.gallery');
+  if(photos.length){
+    if(!gallery){
+      gallery=document.createElement('div');
+      gallery.className='gallery';
+      body.querySelector('.detail-head')?.insertAdjacentElement('afterend',gallery);
+    }
+    const photoKey=code+'|'+photos.map(a=>a.id||a.storage_path).join('|');
+    if(gallery.dataset.cloudKey!==photoKey){
+      gallery.dataset.cloudKey=photoKey;
+      gallery.innerHTML='<div class="placeholder">Loading private photographs…</div>';
+      const urls=await Promise.all(photos.map(a=>secureUrl(a,7200).catch(()=>null)));
+      if(gallery.dataset.cloudKey===photoKey){
+        gallery.innerHTML=urls.map((u,i)=>u?`<img src="${esc(u)}" alt="${esc(photos[i].caption||photos[i].file_name)}">`:'').join('')
+          ||'<div class="placeholder">Private photographs could not be opened.</div>';
+      }
+    }
+  }
+
+  const section=[...body.querySelectorAll('.detail-content section')]
+    .find(s=>s.querySelector('h3')?.textContent==='Related materials');
+  if(!section)return;
+
+  const rows=materialRows(code);
+  const materialKey=code+'|'+rows.map(a=>a.id||a.storage_path).join('|');
+  if(section.dataset.cloudMaterialsKey===materialKey)return;
+  section.dataset.cloudMaterialsKey=materialKey;
+  section.querySelectorAll('.materials-list,.placeholder').forEach(x=>x.remove());
+
+  if(!rows.length){
+    section.insertAdjacentHTML('beforeend','<div class="placeholder">No related documents have been added.</div>');
+    return;
+  }
+
+  const loading=document.createElement('div');
+  loading.className='placeholder';
+  loading.textContent='Loading private documents…';
+  section.appendChild(loading);
+
+  const resolved=await Promise.all(rows.map(async a=>{
+    try{return {a,url:await secureUrl(a,3600)};}
+    catch(err){console.error('Could not create private document link',a,err);return {a,url:null};}
+  }));
+
+  const currentCode=body.querySelector('.code')?.textContent?.trim();
+  if(currentCode!==code||section.dataset.cloudMaterialsKey!==materialKey)return;
+  loading.remove();
+
+  const working=resolved.filter(x=>x.url);
+  if(!working.length){
+    section.insertAdjacentHTML('beforeend','<div class="placeholder">Private documents could not be opened.</div>');
+    return;
+  }
+
+  const wrap=document.createElement('div');
+  wrap.className='materials-list cloud-materials';
+  wrap.innerHTML=working.map(({a,url})=>`<a class="material-item" href="${esc(url)}" target="_blank" rel="noopener noreferrer"><span class="material-type">${esc(a.material_type||'Private document')}</span><strong>${esc(a.file_name||'Open private document')}</strong><small>${esc(a.caption||'Open private file')}</small></a>`).join('');
+  section.appendChild(wrap);
 }
 async function patchAbout(){for(const el of $$('[data-private-source]')){const path=el.dataset.privateSource,a=bySource.get(path);if(!a)continue;if(el.tagName==='IMG'){if(!el.src||!el.dataset.privateReady){el.src=await secureUrl(a,7200);el.dataset.privateReady='yes';}}else if(!el.dataset.privateReady){el.onclick=e=>{e.preventDefault();openPrivateAttachment(a)};el.dataset.privateReady='yes';}}
 const portrait=$('#portraitUpload');if(portrait)portrait.closest('.portrait-control')?.classList.toggle('hidden',bySource.has('images/about/jane-freese.jpg'));
 }
 function patchPrivateMedia(){if(!LISCloud.signedIn())return;$$('.card').forEach(card=>{if(!card.dataset.cloudPatched)patchCard(card)});patchDetail().catch(()=>{});patchAbout().catch(()=>{});}
-async function backup(){const records=LISApp.getRecords(),inventory=attachments.map(({owner_id,...a})=>a),payload={version:'0.6.4',createdAt:new Date().toISOString(),catalogRecords:records,privateAttachmentInventory:inventory,note:'Private file contents remain in Supabase Storage. This backup preserves the catalog and attachment index.'};download(`Legacy_in_Stone_Cloud_Backup_${new Date().toISOString().slice(0,10)}.json`,new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}));toast('Cloud catalog and attachment inventory exported.','success');}
+async function backup(){const records=LISApp.getRecords(),inventory=attachments.map(({owner_id,...a})=>a),payload={version:'0.6.4.4',createdAt:new Date().toISOString(),catalogRecords:records,privateAttachmentInventory:inventory,note:'Private file contents remain in Supabase Storage. This backup preserves the catalog and attachment index.'};download(`Legacy_in_Stone_Cloud_Backup_${new Date().toISOString().slice(0,10)}.json`,new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}));toast('Cloud catalog and attachment inventory exported.','success');}
 async function saveAttachment(e){e.preventDefault();const f=new FormData(e.target),file=(f.get('camera_file')&&f.get('camera_file').name)?f.get('camera_file'):f.get('file'),specimen=specimenById(f.get('id')),type=String(f.get('material_type'));if(!file||!file.name){toast('Choose a file first.','error');return;}if(!LISCloud.signedIn()){toast('Sign in before uploading a file.','error');return;}const submit=e.target.querySelector('[type=submit]');submit.disabled=true;try{const row=await LISCloud.uploadAttachment({file,specimenCode:specimen?.specimen_code,type,caption:String(f.get('caption')||'')});if(type==='Specimen photograph'&&specimen){const records=LISApp.getRecords(),target=records.find(x=>Number(x.id)===Number(specimen.id));target.photos=Array.isArray(target.photos)?target.photos:[];target.photos.push({is_primary:target.photos.length===0,cloud_storage_path:row.storage_path,file_name:row.file_name});await LISCloud.upsertSpecimen(target);LISApp.replaceRecords(records);}$('#attachmentDialog').close();toast(`${type} saved to private cloud storage.`,'success');await refreshAttachments();if(specimen)LISApp.openDetail(specimen.id);}catch(err){toast('File save failed: '+err.message,'error');}finally{submit.disabled=false;}}
 function statusText(){if(!LISCloud.configured())return'Cloud account not connected';return LISCloud.signedIn()?'Signed in — cloud saving is active':'Cloud configured; sign in required';}
 function refreshStatus(){const s=$('#cloudStatus');if(s)s.textContent=statusText();const last=localStorage.getItem('lis-last-sync');const meta=$('#lastSync');if(meta)meta.textContent=last?`Last full catalog save from this device: ${new Date(last).toLocaleString()}`:'Individual edits and imports save automatically. A full catalog save has not been run from this device.';if($('#cloudSignOut'))$('#cloudSignOut').disabled=!LISCloud.signedIn();if($('#cloudPush'))$('#cloudPush').disabled=!LISCloud.signedIn();}
