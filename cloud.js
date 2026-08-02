@@ -113,13 +113,46 @@
     const objectPath=`${session.user.id}/${folder}/${sourceKey}`;
     await uploadObject(file,objectPath);
     const row={owner_id:session.user.id,specimen_code:specimenCode||null,material_type:type,file_name:file.name,mime_type:file.type||'application/octet-stream',storage_path:objectPath,caption,source_path:sourcePath};
-    await request('/rest/v1/attachments?on_conflict=owner_id%2Csource_path',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(row)});
-    return row;
+    const saved=await request('/rest/v1/attachments?on_conflict=owner_id%2Csource_path',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=representation'},body:JSON.stringify(row)});
+    return Array.isArray(saved)&&saved.length?saved[0]:row;
   }
   async function listAttachments(specimenCode){
     await ensureSession();
     const filter=specimenCode?`&specimen_code=eq.${encodeURIComponent(specimenCode)}`:'';
     return request(`/rest/v1/attachments?select=*&order=created_at.desc${filter}`);
+  }
+  async function updateAttachment(id,changes){
+    await ensureSession();
+    if(!id) throw new Error('Attachment ID is required.');
+    const allowed={};
+    for(const key of ['caption','display_order','is_primary','file_name','mime_type']) if(Object.prototype.hasOwnProperty.call(changes||{},key)) allowed[key]=changes[key];
+    return request(`/rest/v1/attachments?id=eq.${encodeURIComponent(id)}`,{method:'PATCH',headers:{Prefer:'return=representation'},body:JSON.stringify(allowed)});
+  }
+  async function setPrimaryPhoto(specimenCode,id){
+    await ensureSession();
+    const code=encodeURIComponent(specimenCode);
+    await request(`/rest/v1/attachments?specimen_code=eq.${code}&material_type=eq.${encodeURIComponent('Specimen photograph')}`,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify({is_primary:false})});
+    await updateAttachment(id,{is_primary:true,display_order:0});
+  }
+  async function reorderPhotos(photoRows){
+    await ensureSession();
+    for(let i=0;i<photoRows.length;i++) await updateAttachment(photoRows[i].id,{display_order:i});
+  }
+  async function replaceAttachment(attachment,file){
+    await ensureSession();
+    if(!attachment?.storage_path) throw new Error('Storage path is missing.');
+    await uploadObject(file,attachment.storage_path);
+    await updateAttachment(attachment.id,{file_name:file.name,mime_type:file.type||'application/octet-stream'});
+    return {...attachment,file_name:file.name,mime_type:file.type||'application/octet-stream'};
+  }
+  async function deleteAttachment(attachment){
+    await ensureSession();
+    if(!attachment?.id) throw new Error('Attachment ID is required.');
+    if(attachment.storage_path){
+      const response=await fetch(`${cfg.supabaseUrl}/storage/v1/object/collection-files/${attachment.storage_path}`,{method:'DELETE',headers:{apikey:cfg.supabaseAnonKey,Authorization:`Bearer ${session.access_token}`}});
+      if(!response.ok&&response.status!==404){const e=await parseError(response);throw new Error(`Storage delete ${response.status}: ${e.message}`);}
+    }
+    await request(`/rest/v1/attachments?id=eq.${encodeURIComponent(attachment.id)}`,{method:'DELETE',headers:{Prefer:'return=minimal'}});
   }
   async function signedUrl(storagePath,expiresIn=3600){
     await ensureSession();
@@ -133,5 +166,5 @@
     const rows=await request('/rest/v1/attachments?select=source_path&source_path=not.is.null');
     return new Set((rows||[]).map(x=>x.source_path));
   }
-  window.LISCloud={configured:()=>Boolean(cfg.enabled&&cfg.supabaseUrl&&cfg.supabaseAnonKey),signedIn:()=>Boolean(session?.access_token),user:()=>session?.user||null,signIn,signOut,refreshSession,pushCatalog,upsertSpecimen,pullCatalog,uploadAttachment,listAttachments,signedUrl,migratedSourcePaths};
+  window.LISCloud={configured:()=>Boolean(cfg.enabled&&cfg.supabaseUrl&&cfg.supabaseAnonKey),signedIn:()=>Boolean(session?.access_token),user:()=>session?.user||null,signIn,signOut,refreshSession,pushCatalog,upsertSpecimen,pullCatalog,uploadAttachment,listAttachments,updateAttachment,setPrimaryPhoto,reorderPhotos,replaceAttachment,deleteAttachment,signedUrl,migratedSourcePaths};
 })();
