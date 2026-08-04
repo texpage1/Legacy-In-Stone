@@ -35,7 +35,7 @@ async function openPrivateAttachment(a){const tab=window.open('about:blank','_bl
 function photoRows(code){return (bySpecimen.get(code)||[]).filter(isPhoto).sort(attachmentSort);}
 function materialRows(code){return (bySpecimen.get(code)||[]).filter(a=>!isPhoto(a));}
 function queuePatch(){if(patchQueued)return;patchQueued=true;requestAnimationFrame(()=>{patchQueued=false;patchPrivateMedia();});}
-async function patchCard(card){if(card.dataset.cloudPatched==='loading')return;const code=card.querySelector('.code')?.textContent?.trim(),photo=photoRows(code)[0],box=card.querySelector('.photo');if(!photo||!box)return;card.dataset.cloudPatched='loading';try{box.style.backgroundImage=`url("${await secureUrl(photo,7200)}")`;box.textContent='';card.dataset.cloudPatched='yes';}catch(_){delete card.dataset.cloudPatched;}}
+async function patchCard(card){if(card.dataset.cloudPatched==='loading')return;const code=card.querySelector('.code')?.textContent?.trim(),photo=photoRows(code)[0],box=card.querySelector('.photo');if(!photo||!box)return;card.dataset.cloudPatched='loading';try{box.style.backgroundImage=`url("${await secureUrl(photo,7200)}")`;box.textContent='';box.classList.add('has-photo');card.dataset.cloudPatched='yes';}catch(_){delete card.dataset.cloudPatched;}}
 async function managePhoto(action,photo,photos,code,index){
   try{
     if(action==='primary'){
@@ -78,7 +78,12 @@ async function patchDetail(){
   if(!code)return;
   const photos=photoRows(code);
   let gallery=body.querySelector('.gallery');
+  const stalePhotoPlaceholders=[...body.querySelectorAll(':scope > .detail-content')].filter(block=>{
+    const placeholder=block.querySelector(':scope > .placeholder');
+    return placeholder && /photograph has not been added yet/i.test(placeholder.textContent||'');
+  });
   if(photos.length){
+    stalePhotoPlaceholders.forEach(block=>block.remove());
     if(!gallery){gallery=document.createElement('div');gallery.className='gallery managed-gallery';body.querySelector('.detail-head')?.insertAdjacentElement('afterend',gallery);}
     gallery.classList.add('managed-gallery');
     const photoKey=code+'|'+photos.map(a=>[a.id,a.file_name,a.is_primary,a.display_order,a.updated_at].join(':')).join('|');
