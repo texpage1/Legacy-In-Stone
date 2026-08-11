@@ -92,6 +92,34 @@
     const rows=await request('/rest/v1/specimens?select=payload&order=specimen_code');
     return (rows||[]).map(x=>x.payload);
   }
+  async function deleteSpecimen(record){
+    await ensureSession();
+    const code=String(record?.specimen_code||'').trim();
+    if(!code) throw new Error('Specimen number is required.');
+    const rows=await listAttachments(code);
+    for(const attachment of rows||[]) await deleteAttachment(attachment);
+    await request(`/rest/v1/specimens?owner_id=eq.${encodeURIComponent(session.user.id)}&specimen_code=eq.${encodeURIComponent(code)}`,{method:'DELETE',headers:{Prefer:'return=minimal'}});
+    return true;
+  }
+  async function renameSpecimen(oldCode,newRecord){
+    await ensureSession();
+    oldCode=String(oldCode||'').trim();
+    const newCode=String(newRecord?.specimen_code||'').trim();
+    if(!oldCode||!newCode) throw new Error('Both old and new specimen numbers are required.');
+    if(oldCode===newCode){await upsertSpecimen(newRecord);return newRecord;}
+    const existing=await request(`/rest/v1/specimens?select=specimen_code&owner_id=eq.${encodeURIComponent(session.user.id)}&specimen_code=eq.${encodeURIComponent(newCode)}`);
+    if(existing?.length) throw new Error(`${newCode} already exists.`);
+    await upsertSpecimen(newRecord);
+    try{
+      await request(`/rest/v1/attachments?owner_id=eq.${encodeURIComponent(session.user.id)}&specimen_code=eq.${encodeURIComponent(oldCode)}`,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify({specimen_code:newCode})});
+      await request(`/rest/v1/specimens?owner_id=eq.${encodeURIComponent(session.user.id)}&specimen_code=eq.${encodeURIComponent(oldCode)}`,{method:'DELETE',headers:{Prefer:'return=minimal'}});
+    }catch(err){
+      try{await request(`/rest/v1/attachments?owner_id=eq.${encodeURIComponent(session.user.id)}&specimen_code=eq.${encodeURIComponent(newCode)}`,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify({specimen_code:oldCode})});}catch(_){}
+      try{await request(`/rest/v1/specimens?owner_id=eq.${encodeURIComponent(session.user.id)}&specimen_code=eq.${encodeURIComponent(newCode)}`,{method:'DELETE',headers:{Prefer:'return=minimal'}});}catch(_){}
+      throw err;
+    }
+    return newRecord;
+  }
   function safeName(name){return String(name||'file').replace(/[^a-zA-Z0-9._-]+/g,'-');}
   function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
   async function uploadObject(file,objectPath,attempt=0){
@@ -166,5 +194,5 @@
     const rows=await request('/rest/v1/attachments?select=source_path&source_path=not.is.null');
     return new Set((rows||[]).map(x=>x.source_path));
   }
-  window.LISCloud={configured:()=>Boolean(cfg.enabled&&cfg.supabaseUrl&&cfg.supabaseAnonKey),signedIn:()=>Boolean(session?.access_token),user:()=>session?.user||null,signIn,signOut,refreshSession,pushCatalog,upsertSpecimen,pullCatalog,uploadAttachment,listAttachments,updateAttachment,setPrimaryPhoto,reorderPhotos,replaceAttachment,deleteAttachment,signedUrl,migratedSourcePaths};
+  window.LISCloud={configured:()=>Boolean(cfg.enabled&&cfg.supabaseUrl&&cfg.supabaseAnonKey),signedIn:()=>Boolean(session?.access_token),user:()=>session?.user||null,signIn,signOut,refreshSession,pushCatalog,upsertSpecimen,pullCatalog,deleteSpecimen,renameSpecimen,uploadAttachment,listAttachments,updateAttachment,setPrimaryPhoto,reorderPhotos,replaceAttachment,deleteAttachment,signedUrl,migratedSourcePaths};
 })();
