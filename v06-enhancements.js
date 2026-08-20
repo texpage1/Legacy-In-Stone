@@ -30,6 +30,7 @@ function syncPhotoMetadata(){
   if(changed)LISApp.replaceRecords(records);
 }
 async function refreshAttachments(){if(!LISCloud.signedIn())return;indexAttachments(await LISCloud.listAttachments(null));syncPhotoMetadata();queuePatch();}
+window.LISRefreshAttachments=refreshAttachments;
 async function secureUrl(a,expires=3600){if(!a)return null;if(a._signedUrl&&a._signedUntil>Date.now()+60000)return a._signedUrl;a._signedUrl=await LISCloud.signedUrl(a.storage_path,expires);a._signedUntil=Date.now()+Math.max(60000,(expires-60)*1000);return a._signedUrl;}
 async function openPrivateAttachment(a){const tab=window.open('about:blank','_blank');try{const url=await secureUrl(a);if(tab){tab.location.replace(url);}else{window.location.href=url;}}catch(err){if(tab)tab.close();toast('Could not open private file: '+err.message,'error');}}
 function photoRows(code){return (bySpecimen.get(code)||[]).filter(isPhoto).sort(attachmentSort);}
