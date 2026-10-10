@@ -36,7 +36,7 @@ async function openPrivateAttachment(a){const tab=window.open('about:blank','_bl
 function photoRows(code){return (bySpecimen.get(code)||[]).filter(isPhoto).sort(attachmentSort);}
 function materialRows(code){return (bySpecimen.get(code)||[]).filter(a=>!isPhoto(a));}
 function queuePatch(){if(patchQueued)return;patchQueued=true;requestAnimationFrame(()=>{patchQueued=false;patchPrivateMedia();});}
-async function patchCard(card){if(card.dataset.cloudPatched==='loading')return;const code=card.querySelector('.code')?.textContent?.trim(),photo=photoRows(code)[0],box=card.querySelector('.photo');if(!photo||!box)return;card.dataset.cloudPatched='loading';try{box.style.backgroundImage=`url("${await secureUrl(photo,7200)}")`;box.textContent='';box.classList.add('has-photo');card.dataset.cloudPatched='yes';}catch(_){delete card.dataset.cloudPatched;}}
+async function patchCard(card){if(card.dataset.cloudPatched==='loading')return;const code=card.querySelector('.code')?.textContent?.trim(),photo=photoRows(code)[0],box=card.querySelector('.photo');if(!photo||!box)return;card.dataset.cloudPatched='loading';try{box.style.backgroundImage=`url("${await secureUrl(photo,7200)}")`;[...box.childNodes].filter(n=>n.nodeType===Node.TEXT_NODE).forEach(n=>n.remove());box.classList.add('has-photo');card.dataset.cloudPatched='yes';}catch(_){delete card.dataset.cloudPatched;}}
 async function managePhoto(action,photo,photos,code,index){
   try{
     if(action==='primary'){
