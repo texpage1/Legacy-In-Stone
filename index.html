@@ -1,82 +1,935 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Legacy in Stone</title><link rel="stylesheet" href="styles.css"></head><body>
-<header><button class="brand" data-view="home"><b>L</b><span><strong>Legacy in Stone</strong></span></button><nav><button data-view="home">Home</button><button data-view="browse">Browse</button><button data-view="about">About the Collection</button><button data-view="stats">Statistics</button><button id="settingsButton">Settings & Backup</button></nav></header>
-<main>
-<section id="home" class="view"><div class="hero"><div class="shade"></div><div class="hero-copy"><p class="eyebrow">A family collection preserved</p><h1>Legacy in Stone</h1><p>A digital museum for minerals, geodes, agates, fossils, and the history of the Jane Freese Collection.</p><div class="hero-actions"><button class="primary" data-view="browse">Browse</button><button class="secondary" data-view="about">About</button><button class="secondary" id="importHome">Import</button></div></div></div>
-<div class="summary"><article><strong id="total">594</strong><span>cataloged specimens</span></article><article><strong id="photosTotal">454</strong><span>collection photographs</span></article><article><strong id="janeTotal">441</strong><span>Jane Freese specimens</span></article></div>
-<section class="section"><p class="eyebrow">Explore</p><h2>Enter the Collection</h2><div class="entrances"><button data-category="Minerals"><em id="mineralsCount"></em><strong>Minerals</strong><span>Mineral and ore specimens from classic localities, family travels, and decades of collecting.</span></button><button data-category="Geodes & Agates"><em id="agatesCount"></em><strong>Geodes & Agates</strong><span>Colorful banded, nodular, and polished agate and geode specimens reflecting the distinctive patterns, textures, and traditions of rockhounding.</span></button><button data-category="Fossils"><em id="fossilsCount"></em><strong>Fossils</strong><span>A remarkably diverse record of ancient life including trilobites, brachiopods, corals, plants, and more with a special focus on Iowa fossils collected from the Devonian and multiple historical localities.</span></button></div></section>
-<section class="section featured"><p class="eyebrow">A first look</p><h2>Featured specimens</h2><div id="featured" class="grid"></div></section></section>
-<section id="browse" class="view hidden"><div class="page-title"><div><p class="eyebrow">Collection browser</p><h1>Browse specimens</h1><p>Search by name, number, locality, mineral or fossil group, provenance, age, or notes.</p></div><div class="page-actions"><button id="importBrowse" class="outline">Import Specimen</button><button id="exportCsv" class="outline">Export CSV</button><button id="clear" class="outline">Clear filters</button></div></div><div class="toolbar"><label>Search<input id="search" placeholder="Try Quartz, Trilobite, Devonian, F-003, or Jane…"></label><label>Category<select id="category"><option value="">All categories</option></select></label><label>Collection<select id="owner"><option value="">All collections</option></select></label><label>Photographs<select id="photoFilter"><option value="">Any status</option><option value="yes" selected>Has photographs</option><option value="no">Awaiting photographs</option></select></label></div><div class="results"><strong id="resultCount"></strong><label>Sort <select id="sort"><option value="number">Specimen number</option><option value="name">Name</option><option value="locality">Locality</option></select></label></div><div id="grid" class="grid"></div><button id="more" class="outline hidden">Show more specimens</button></section>
-<section id="about" class="view hidden"><div class="about-hero"><p class="eyebrow">About the Collection</p><h1>A collection carried forward</h1><p>Preserving Jane Freese’s collecting history, family records, and the specimens that remain part of her legacy.</p></div><div class="about-grid"><article class="jane-profile"><img data-private-source="images/about/jane-freese.jpg" alt="Jane Freese"><div><p class="eyebrow">Jane Freese</p><h2>A Lifelong Interest</h2><p>Jane Freese was my grandmother who instilled my love of geology. As a child, I remember her collection of fossils and minerals being stored in two antique wooden cabinets in the living room of their house. She collected the specimens herself and worked to identify them based on the limited resources available to her. The individual specimens were usually adhered to a small section of styrofoam and labeled with an embossed Dymo label and frequently a small typewritten paper label to preserve names and collecting localities. Some of those paper labels are included as photos in Legacy in Stone as original labels. What I know now, is that she did a remarkably good job of identifying specimens given the resources available to an amateur collector at the time. Commonly, where names have been changed, it is due to refinement using resources not available to her at the time and not correcting poor identification.</p><p>As the linked article notes, she discovered her passion for fossils following a delivery of limestone to the family farm. After retiring from farming, she and my grandfather took up traveling in their Airstream trailer and continued to “rockhound” and expand the mineral and fossil collection.</p><p>My grandparents had a full lapidary room and would cut and polish stones for jewelry. My grandfather took up silversmithing and created pieces of jewelry using the cut stones for family and friends.</p><p>When I earned my degree in geology, my grandmother wanted me to have her collections. She gave me her collection of fossils and minerals, along with her notes and mineral guide, before she passed away in 2009.</p><p>The Jane Freese Collection preserves a representative American rockhound collection assembled during a particularly active period of American amateur rock and fossil collecting in the 1960s and early 1970s. A charter member of Iowa’s Black Hawk Gem & Mineral Society, Jane was part of an organized network of amateur collectors. Alongside fossils and minerals collected near her Iowa home, Jane acquired specimens from classic collecting localities throughout North America through field collecting, rock swaps, mail exchanges, and commercial dealers. Some of those localities are now closed, protected, depleted, or otherwise inaccessible, giving the collection value not only for its specimens and the provenance preserved with them, but also as a record of an earlier era of amateur geology and paleontology.</p><a class="document-link private-source-link" data-private-source="documents/about/grandma-limestone-hobby.pdf" href="#"><span>Newspaper article</span><strong>Grandma Limestone Hobby</strong><small>Open PDF</small></a></div>
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <title>
+   Legacy in Stone
+  </title>
+  <link href="styles.css" rel="stylesheet"/>
+ </head>
+ <body>
+  <header>
+   <button class="brand" data-view="home">
+    <b>
+     L
+    </b>
+    <span>
+     <strong>
+      Legacy in Stone
+     </strong>
+    </span>
+   </button>
+   <nav>
+    <button data-view="home">
+     Home
+    </button>
+    <button data-view="browse">
+     Browse
+    </button>
+    <button data-view="about">
+     About the Collection
+    </button>
+    <button data-view="stats">
+     Statistics
+    </button>
+    <button id="settingsButton">
+     Settings &amp; Backup
+    </button>
+   </nav>
+  </header>
+  <main>
+   <section class="view" id="home">
+    <div class="hero">
+     <div class="shade">
+     </div>
+     <div class="hero-copy">
+      <p class="eyebrow">
+       A family collection preserved
+      </p>
+      <h1>
+       Legacy in Stone
+      </h1>
+      <p>
+       A digital museum for minerals, geodes, agates, fossils, and the history of the Jane Freese Collection.
+      </p>
+      <div class="hero-actions">
+       <button class="primary" data-view="browse">
+        Browse
+       </button>
+       <button class="secondary" data-view="about">
+        About
+       </button>
+       <button class="secondary" id="importHome">
+        Import
+       </button>
+      </div>
+     </div>
+    </div>
+    <div class="summary">
+     <article>
+      <strong id="total">
+       594
+      </strong>
+      <span>
+       cataloged specimens
+      </span>
+     </article>
+     <article>
+      <strong id="photosTotal">
+       454
+      </strong>
+      <span>
+       collection photographs
+      </span>
+     </article>
+     <article>
+      <strong id="janeTotal">
+       441
+      </strong>
+      <span>
+       Jane Freese specimens
+      </span>
+     </article>
+    </div>
+    <section class="section">
+     <p class="eyebrow">
+      Explore
+     </p>
+     <h2>
+      Enter the Collection
+     </h2>
+     <div class="entrances">
+      <button data-category="Minerals">
+       <em id="mineralsCount">
+       </em>
+       <strong>
+        Minerals
+       </strong>
+       <span>
+        Mineral and ore specimens from classic localities, family travels, and decades of collecting.
+       </span>
+      </button>
+      <button data-category="Geodes &amp; Agates">
+       <em id="agatesCount">
+       </em>
+       <strong>
+        Geodes &amp; Agates
+       </strong>
+       <span>
+        Colorful banded, nodular, and polished agate and geode specimens reflecting the distinctive patterns, textures, and traditions of rockhounding.
+       </span>
+      </button>
+      <button data-category="Fossils">
+       <em id="fossilsCount">
+       </em>
+       <strong>
+        Fossils
+       </strong>
+       <span>
+        A remarkably diverse record of ancient life including trilobites, brachiopods, corals, plants, and more with a special focus on Iowa fossils collected from the Devonian and multiple historical localities.
+       </span>
+      </button>
+     </div>
+    </section>
+    <section class="section featured">
+     <p class="eyebrow">
+      A first look
+     </p>
+     <h2>
+      Featured specimens
+     </h2>
+     <div class="grid" id="featured">
+     </div>
+    </section>
+    <section class="section special-galleries">
+     <div class="section-heading">
+      <div>
+       <p class="eyebrow">
+        A closer look
+       </p>
+       <h2>
+        Special Galleries
+       </h2>
+      </div>
+      <button class="outline" data-view="galleries">
+       View All Galleries →
+      </button>
+     </div>
+     <div class="gallery-tiles" id="galleryTiles">
+     </div>
+    </section>
+   </section>
+   <section class="view hidden" id="galleries">
+    <div class="page-title">
+     <div>
+      <p class="eyebrow">
+       Explore the collection
+      </p>
+      <h1>
+       Special Galleries
+      </h1>
+      <p>
+       A few favorite specimens and interesting connections.
+      </p>
+     </div>
+    </div>
+    <div class="gallery-tiles" id="allGalleryTiles">
+    </div>
+   </section>
+   <section class="view hidden" id="specialGallery">
+    <div class="page-title">
+     <div>
+      <button class="outline gallery-back" data-view="galleries">
+       ← All Galleries
+      </button>
+      <p class="eyebrow">
+       Special Gallery
+      </p>
+      <h1 id="specialGalleryTitle">
+      </h1>
+      <p class="gallery-intro" id="specialGalleryIntro">
+      </p>
+     </div>
+    </div>
+    <div class="results">
+     <strong id="galleryResultCount">
+     </strong>
+    </div>
+    <div class="grid" id="specialGalleryGrid">
+    </div>
+   </section>
+   <section class="view hidden" id="browse">
+    <div class="page-title">
+     <div>
+      <p class="eyebrow">
+       Collection browser
+      </p>
+      <h1>
+       Browse specimens
+      </h1>
+      <p>
+       Search by name, number, locality, mineral or fossil group, provenance, age, or notes.
+      </p>
+     </div>
+     <div class="page-actions">
+      <button class="outline" id="importBrowse">
+       Import Specimen
+      </button>
+      <button class="outline" id="exportCsv">
+       Export CSV
+      </button>
+      <button class="outline" id="clear">
+       Clear filters
+      </button>
+     </div>
+    </div>
+    <div class="toolbar">
+     <label>
+      Search
+      <input id="search" placeholder="Try Quartz, Trilobite, Devonian, F-003, or Jane…"/>
+     </label>
+     <label>
+      Category
+      <select id="category">
+       <option value="">
+        All categories
+       </option>
+      </select>
+     </label>
+     <label>
+      Collection
+      <select id="owner">
+       <option value="">
+        All collections
+       </option>
+      </select>
+     </label>
+     <label>
+      Photographs
+      <select id="photoFilter">
+       <option value="">
+        Any status
+       </option>
+       <option selected="" value="yes">
+        Has photographs
+       </option>
+       <option value="no">
+        Awaiting photographs
+       </option>
+      </select>
+     </label>
+    </div>
+    <div class="results">
+     <strong id="resultCount">
+     </strong>
+     <label>
+      Sort
+      <select id="sort">
+       <option value="number">
+        Specimen number
+       </option>
+       <option value="name">
+        Name
+       </option>
+       <option value="locality">
+        Locality
+       </option>
+      </select>
+     </label>
+    </div>
+    <div class="grid" id="grid">
+    </div>
+    <button class="outline hidden" id="more">
+     Show more specimens
+    </button>
+   </section>
+   <section class="view hidden" id="about">
+    <div class="about-hero">
+     <p class="eyebrow">
+      About the Collection
+     </p>
+     <h1>
+      A collection carried forward
+     </h1>
+     <p>
+      Preserving Jane Freese’s collecting history, family records, and the specimens that remain part of her legacy.
+     </p>
+    </div>
+    <div class="about-grid">
+     <article class="jane-profile">
+      <img alt="Jane Freese" data-private-source="images/about/jane-freese.jpg"/>
+      <div>
+       <p class="eyebrow">
+        Jane Freese
+       </p>
+       <h2>
+        A Lifelong Interest
+       </h2>
+       <p>
+        Jane Freese was my grandmother who instilled my love of geology. As a child, I remember her collection of fossils and minerals being stored in two antique wooden cabinets in the living room of their house. She collected the specimens herself and worked to identify them based on the limited resources available to her. The individual specimens were usually adhered to a small section of styrofoam and labeled with an embossed Dymo label and frequently a small typewritten paper label to preserve names and collecting localities. Some of those paper labels are included as photos in Legacy in Stone as original labels. What I know now, is that she did a remarkably good job of identifying specimens given the resources available to an amateur collector at the time. Commonly, where names have been changed, it is due to refinement using resources not available to her at the time and not correcting poor identification.
+       </p>
+       <p>
+        As the linked article notes, she discovered her passion for fossils following a delivery of limestone to the family farm. After retiring from farming, she and my grandfather took up traveling in their Airstream trailer and continued to “rockhound” and expand the mineral and fossil collection.
+       </p>
+       <p>
+        My grandparents had a full lapidary room and would cut and polish stones for jewelry. My grandfather took up silversmithing and created pieces of jewelry using the cut stones for family and friends.
+       </p>
+       <p>
+        When I earned my degree in geology, my grandmother wanted me to have her collections. She gave me her collection of fossils and minerals, along with her notes and mineral guide, before she passed away in 2009.
+       </p>
+       <p>
+        The Jane Freese Collection preserves a representative American rockhound collection assembled during a particularly active period of American amateur rock and fossil collecting in the 1960s and early 1970s. A charter member of Iowa’s Black Hawk Gem &amp; Mineral Society, Jane was part of an organized network of amateur collectors. Alongside fossils and minerals collected near her Iowa home, Jane acquired specimens from classic collecting localities throughout North America through field collecting, rock swaps, mail exchanges, and commercial dealers. Some of those localities are now closed, protected, depleted, or otherwise inaccessible, giving the collection value not only for its specimens and the provenance preserved with them, but also as a record of an earlier era of amateur geology and paleontology.
+       </p>
+       <a class="document-link private-source-link" data-private-source="documents/about/grandma-limestone-hobby.pdf" href="#">
+        <span>
+         Newspaper article
+        </span>
+        <strong>
+         Grandma Limestone Hobby
+        </strong>
+        <small>
+         Open PDF
+        </small>
+       </a>
+      </div>
+      <figure class="cabinet-history">
+       <img alt="Antique ribbon cabinet used by Jane Freese to display her mineral collection" src="images/about/Mineral-cabinet.JPEG"/>
+       <figcaption>
+        <strong>
+         Jane's mineral cabinet
+        </strong>
+        — This antique ribbon cabinet was used by Jane to display her mineral collection in her home.
+       </figcaption>
+      </figure>
+     </article>
+     <article>
+      <p class="eyebrow">
+       Collection History
+      </p>
+      <h2>
+       Notes from the collection
+      </h2>
+      <p>
+       Inherited specimens are identified throughout the application as the
+       <strong>
+        Jane Freese Collection
+       </strong>
+       . Her broader notes are preserved here as collection-wide history.
+      </p>
+      <a class="document-link private-source-link" data-private-source="documents/about/grandma-rock-notes.pdf" href="#">
+       <span>
+        Collection history
+       </span>
+       <strong>
+        Grandma Rock Notes
+       </strong>
+       <small>
+        Open PDF
+       </small>
+      </a>
+      <div class="original-displays">
+       <p class="eyebrow">
+        Original Displays
+       </p>
+       <h3>
+        Preserving Jane's Methods
+       </h3>
+       <img alt="Original Jane Freese specimen mount with embossed label reading Platyostoma, Dumont, Iowa" class="original-mount-image" src="images/about/jane-freese-original-mount.JPEG"/>
+       <p>
+        Many specimens in the Jane Freese Collection were mounted on hand-cut pieces of Styrofoam with embossed labels identifying the specimen and locality. These original mounts and labels have been preserved whenever practical because they provide an insight into how she organized and documented her collection.
+       </p>
+      </div>
+     </article>
+     <article class="guide-history">
+      <p class="eyebrow">
+       Collection History
+      </p>
+      <h2>
+       Jane Freese’s Mineral Guide
+      </h2>
+      <img alt="Jane Freese's well-used mineral guide" class="history-image" data-private-source="images/about/jane-mineral-guide.jpg"/>
+      <p>
+       This well-used mineral guide was part of the collection my grandmother passed down with her notes, minerals, and fossils. Its worn cover and repaired binding reflect many years of use.
+      </p>
+     </article>
+     <article class="wide">
+      <h2>
+       Articles connected to specimens
+      </h2>
+      <p class="about-intro">
+       Research and reference articles are now linked directly to the relevant specimen records. Open a specimen and look under
+       <strong>
+        Related materials
+       </strong>
+       .
+      </p>
+      <div class="archive-summary">
+       <strong>
+        19
+       </strong>
+       <span>
+        articles and research documents linked to 17 specimen records
+       </span>
+      </div>
+     </article>
+    </div>
+   </section>
+   <section class="view hidden" id="stats">
+    <div class="page-title">
+     <div>
+      <p class="eyebrow">
+       Collection overview
+      </p>
+      <h1>
+       Statistics
+      </h1>
+      <p>
+       A snapshot of the catalog and photography progress.
+      </p>
+     </div>
+    </div>
+    <div class="stat-cards" id="statCards">
+    </div>
+    <div class="stat-cols">
+     <article>
+      <h2>
+       By category
+      </h2>
+      <div id="categoryStats">
+      </div>
+     </article>
+     <article>
+      <h2>
+       By collection
+      </h2>
+      <div id="ownerStats">
+      </div>
+     </article>
+    </div>
+   </section>
+  </main>
+  <dialog id="detail">
+   <button class="close">
+    ×
+   </button>
+   <div id="detailBody">
+   </div>
+  </dialog>
+  <dialog class="form-dialog" id="editDialog">
+   <button class="close-modal" data-close="editDialog">
+    ×
+   </button>
+   <form id="editForm">
+    <div class="form-head">
+     <p class="eyebrow">
+      Manage record
+     </p>
+     <h2>
+      Edit specimen
+     </h2>
+     <p>
+      Changes save directly to your private cloud account.
+     </p>
+    </div>
+    <input name="id" type="hidden"/>
+    <div class="form-grid">
+     <label>
+      Specimen number
+      <input name="specimen_code" pattern="[MF]-[0-9]{3}" required="" title="Use M-### or F-###"/>
+     </label>
+     <label>
+      Name / Identification
+      <input name="name" required=""/>
+     </label>
+     <label>
+      Locality
+      <input name="locality"/>
+     </label>
+     <label>
+      Size
+      <input name="size_class"/>
+     </label>
+     <label>
+      Color
+      <input name="color"/>
+     </label>
+     <label>
+      Collection type
+      <select name="collection_type" required="">
+       <option>
+        Minerals
+       </option>
+       <option>
+        Geodes &amp; Agates
+       </option>
+       <option>
+        Fossils
+       </option>
+      </select>
+     </label>
+     <label>
+      Collection
+      <select name="ownership_collection" required="">
+       <option>
+        Jane Freese Collection
+       </option>
+       <option>
+        Eric Page Collection
+       </option>
+      </select>
+     </label>
+     <label>
+      Status
+      <select name="status">
+       <option value="">
+        Choose location…
+       </option>
+       <option>
+        Display Case 1
+       </option>
+       <option>
+        Display Case 2
+       </option>
+       <option>
+        Storage Box 1
+       </option>
+       <option>
+        Storage Box 2
+       </option>
+       <option>
+        Storage Box 3
+       </option>
+       <option>
+        Storage Box 4
+       </option>
+       <option>
+        Storage Box 5
+       </option>
+       <option>
+        Storage Box 6
+       </option>
+       <option>
+        Storage Box 7
+       </option>
+      </select>
+     </label>
+     <label data-category-field="Minerals">
+      Accessory minerals
+      <input name="accessory_minerals"/>
+     </label>
+     <label data-category-field="Minerals">
+      Luster
+      <input name="luster"/>
+     </label>
+     <label data-category-field="Minerals">
+      Formula
+      <input name="formula"/>
+     </label>
+     <label data-category-field="Minerals">
+      Mineral group
+      <input name="mineral_group"/>
+     </label>
+     <label data-category-field="Minerals">
+      Crystal system
+      <input name="crystal_system"/>
+     </label>
+     <label data-category-field="Fossils">
+      Phylum
+      <input name="phylum"/>
+     </label>
+     <label data-category-field="Fossils">
+      Class
+      <input name="fossil_class"/>
+     </label>
+     <label data-category-field="Fossils">
+      Geological age
+      <input name="geological_age"/>
+     </label>
+     <label class="wide-field">
+      Provenance
+      <textarea name="provenance"></textarea>
+     </label>
+     <label class="wide-field">
+      Notes
+      <textarea name="notes"></textarea>
+     </label>
+     <label class="wide-field">
+      Optional story
+      <textarea name="story"></textarea>
+     </label>
+    </div>
+    <div class="form-actions">
+     <button class="outline danger" id="deleteSpecimen" type="button">
+      Delete Specimen
+     </button>
+     <button class="outline" data-close="editDialog" type="button">
+      Cancel
+     </button>
+     <button class="primary dark-primary" type="submit">
+      Save Changes
+     </button>
+    </div>
+   </form>
+  </dialog>
+  <dialog class="form-dialog" id="importDialog">
+   <button class="close-modal" data-close="importDialog">
+    ×
+   </button>
+   <form id="importForm">
+    <div class="form-head">
+     <p class="eyebrow">
+      Add to the catalog
+     </p>
+     <h2>
+      Import a specimen
+     </h2>
+     <p>
+      The specimen number is assigned automatically from its collection type.
+     </p>
+    </div>
+    <div class="form-grid">
+     <label>
+      Name / Identification
+      <input name="name" required=""/>
+     </label>
+     <label>
+      Locality
+      <input name="locality" required=""/>
+     </label>
+     <label>
+      Size
+      <input name="size_class" required=""/>
+     </label>
+     <label>
+      Color
+      <input name="color" required=""/>
+     </label>
+     <label>
+      Collection type
+      <select name="collection_type" required="">
+       <option>
+        Minerals
+       </option>
+       <option>
+        Geodes &amp; Agates
+       </option>
+       <option>
+        Fossils
+       </option>
+      </select>
+     </label>
+     <label>
+      Collection
+      <select name="ownership_collection" required="">
+       <option>
+        Eric Page Collection
+       </option>
+       <option>
+        Jane Freese Collection
+       </option>
+      </select>
+     </label>
+     <label>
+      Status
+      <select name="status" required="">
+       <option value="">
+        Choose location…
+       </option>
+       <option>
+        Display Case 1
+       </option>
+       <option>
+        Display Case 2
+       </option>
+       <option>
+        Storage Box 1
+       </option>
+       <option>
+        Storage Box 2
+       </option>
+       <option>
+        Storage Box 3
+       </option>
+       <option>
+        Storage Box 4
+       </option>
+       <option>
+        Storage Box 5
+       </option>
+       <option>
+        Storage Box 6
+       </option>
+       <option>
+        Storage Box 7
+       </option>
+      </select>
+     </label>
+     <label data-category-field="Minerals">
+      Accessory minerals
+      <input name="accessory_minerals"/>
+     </label>
+     <label data-category-field="Minerals">
+      Luster
+      <input name="luster"/>
+     </label>
+     <label data-category-field="Minerals">
+      Formula
+      <input name="formula"/>
+     </label>
+     <label data-category-field="Minerals">
+      Mineral group
+      <input name="mineral_group"/>
+     </label>
+     <label data-category-field="Minerals">
+      Crystal system
+      <input name="crystal_system"/>
+     </label>
+     <label data-category-field="Fossils">
+      Phylum
+      <input name="phylum"/>
+     </label>
+     <label data-category-field="Fossils">
+      Class
+      <input name="fossil_class"/>
+     </label>
+     <label data-category-field="Fossils">
+      Geological age
+      <input name="geological_age"/>
+     </label>
+     <label class="wide-field">
+      Notes
+      <textarea name="notes"></textarea>
+     </label>
+     <label>
+      Choose first photograph
+      <input accept="image/*" name="photo_file" type="file"/>
+     </label>
+     <label>
+      Take first photograph
+      <input accept="image/*" capture="environment" name="camera_file" type="file"/>
+     </label>
+    </div>
+    <div class="preview-note">
+     A photograph is optional. If provided, it is uploaded after the specimen is created and becomes the primary photograph.
+    </div>
+    <div class="form-actions">
+     <button class="outline" data-close="importDialog" type="button">
+      Cancel
+     </button>
+     <button class="primary dark-primary" type="submit">
+      Add Specimen
+     </button>
+    </div>
+   </form>
+  </dialog>
+  <dialog class="form-dialog" id="attachmentDialog">
+   <button class="close-modal" data-close="attachmentDialog">
+    ×
+   </button>
+   <form id="attachmentForm">
+    <div class="form-head">
+     <p class="eyebrow">
+      Related materials
+     </p>
+     <h2>
+      Add photos or documents
+     </h2>
+     <p id="attachmentFor">
+     </p>
+    </div>
+    <input name="id" type="hidden"/>
+    <div class="form-grid">
+     <label>
+      Material type
+      <select name="material_type">
+       <option>
+        Specimen photograph
+       </option>
+       <option>
+        Historical label
+       </option>
+       <option>
+        Article
+       </option>
+       <option>
+        Research document
+       </option>
+       <option>
+        Other document
+       </option>
+      </select>
+     </label>
+     <label>
+      Choose existing file
+      <input accept="image/*,.pdf,.doc,.docx" name="file" type="file"/>
+     </label>
+     <label>
+      Take a photograph
+      <input accept="image/*" capture="environment" name="camera_file" type="file"/>
+     </label>
+     <label class="wide-field">
+      Caption or note
+      <textarea name="caption"></textarea>
+     </label>
+    </div>
+    <div class="preview-note">
+     On a phone or iPad, Take a photograph can open the device camera. The selected file is uploaded to private cloud storage and becomes available across your signed-in devices.
+    </div>
+    <div class="form-actions">
+     <button class="outline" data-close="attachmentDialog" type="button">
+      Cancel
+     </button>
+     <button class="primary dark-primary" type="submit">
+      Save Material
+     </button>
+    </div>
+   </form>
+  </dialog>
+  <dialog class="form-dialog" id="settingsDialog">
+   <button class="close-modal" data-close="settingsDialog">
+    ×
+   </button>
+   <div class="settings-panel">
+    <div class="form-head">
+     <p class="eyebrow">
+      Application
+     </p>
+     <h2>
+      Settings, backup, and synchronization
+     </h2>
+     <p>
+      Your catalog and private media are stored in your owner cloud account and are available across signed-in devices.
+     </p>
+    </div>
+    <div class="settings-actions">
+     <button class="outline" id="fullBackup">
+      Export Full Backup
+     </button>
+     <button class="outline" id="migratePetrifiedWood" type="button">
+      Move Petrified Wood to Fossils
+     </button>
+     <button class="outline" hidden="" id="installApp">
+      Install App
+     </button>
+    </div>
+    <section class="cloud-section">
+     <h3>
+      Private cloud
+     </h3>
+     <p id="cloudStatus">
+     </p>
+     <p class="sync-meta" id="lastSync">
+     </p>
+     <div class="cloud-message hidden" id="cloudMessage" role="status">
+     </div>
+     <form class="cloud-login" id="cloudLoginForm">
+      <label>
+       Email
+       <input autocomplete="username" name="email" type="email"/>
+      </label>
+      <label>
+       Password
+       <input autocomplete="current-password" name="password" type="password"/>
+      </label>
+      <button class="primary dark-primary" type="submit">
+       Sign In
+      </button>
+     </form>
+     <div class="settings-actions">
+      <button class="outline" id="cloudPush" type="button">
+       Save All to Cloud
+      </button>
+      <button class="outline" id="cloudSignOut" type="button">
+       Sign Out
+      </button>
+     </div>
+    </section>
+   </div>
+  </dialog>
+  <div class="auth-gate" id="authGate">
+   <div class="auth-card">
+    <div class="auth-mark">
+     L
+    </div>
+    <p class="eyebrow">
+     Private collection
+    </p>
+    <h1>
+     Legacy in Stone
+    </h1>
+    <p>
+     Sign in with your owner account to open the collection.
+    </p>
+    <form class="auth-form" id="authLoginForm">
+     <label>
+      Email
+      <input autocomplete="username" name="email" required="" type="email"/>
+     </label>
+     <label>
+      Password
+      <input autocomplete="current-password" name="password" required="" type="password"/>
+     </label>
+     <button class="primary dark-primary" type="submit">
+      Sign In
+     </button>
+    </form>
+    <p class="cloud-message hidden" id="authError">
+    </p>
+   </div>
+  </div>
+  <div class="toast hidden" id="toast">
+  </div>
+  <script src="app.js">
+  </script>
+  <script src="storage.js">
+  </script>
+  <script src="cloud-config.js">
+  </script>
+  <script src="cloud.js">
+  </script>
+  <script src="v06-enhancements.js">
+  </script>
+ </body>
+</html>
 
-<div class="history-image">
-
-  <img
-
-    src="images/about/Mineral-cabinet.JPEG"
-
-    alt="Antique ribbon cabinet used by Jane Freese to display her mineral collection">
-
-  <p><strong>Jane's mineral cabinet</strong><br>
-
-  This antique ribbon cabinet was used by Jane to display her mineral collection in her home.</p>
-
-</div>
-
-</article><article><p class="eyebrow">Collection History</p><h2>Notes from the collection</h2><p>Inherited specimens are identified throughout the application as the <strong>Jane Freese Collection</strong>. Her broader notes are preserved here as collection-wide history.</p><a class="document-link private-source-link" data-private-source="documents/about/grandma-rock-notes.pdf" href="#"><span>Collection history</span><strong>Grandma Rock Notes</strong><small>Open PDF</small></a><div style="margin-top: 32px; padding-top: 28px; border-top: 1px solid #d8d4ca;">
-
-<div style="
-font-size: 0.9rem;
-font-weight: 700;
-letter-spacing: 0.16em;
-text-transform: uppercase;
-color: #4f6a64;
-margin-bottom: 10px;
-">
-Original Displays
-</div>
-
-<h3 style="
-font-family: Georgia, 'Times New Roman', serif;
-font-size: 2rem;
-font-weight: 400;
-margin: 0 0 22px 0;
-color: #182522;
-">
-Preserving Jane's Methods
-</h3>
-
-<img
-src="images/about/Jane-Freese-original-mount.jpeg"
-alt="Original Jane Freese specimen mount with embossed label reading Platyostoma, Dumont, Iowa"
-style="
-display: block;
-width: 100%;
-max-width: 520px;
-height: auto;
-margin: 0 auto 22px auto;
-border-radius: 16px;
-"
->
-
-<p style="
-margin: 0;
-font-size: 1rem;
-line-height: 1.65;
-color: #666a68;
-">
-Many specimens in the Jane Freese Collection were mounted on hand-cut pieces
-of Styrofoam with embossed labels identifying the specimen and locality.
-These original mounts and labels have been preserved whenever practical
-because they provide an insight into how she organized and
-documented her collection.
-</p>
-
-</div></article><article class="guide-history"><p class="eyebrow">Collection History</p><h2>Jane Freese’s Mineral Guide</h2><img class="history-image" data-private-source="images/about/jane-mineral-guide.jpg" alt="Jane Freese's well-used mineral guide"><p>This well-used mineral guide was part of the collection my grandmother passed down with her notes, minerals, and fossils. Its worn cover and repaired binding reflect many years of use.</p></article><article class="wide"><h2>Articles connected to specimens</h2><p class="about-intro">Research and reference articles are now linked directly to the relevant specimen records. Open a specimen and look under <strong>Related materials</strong>.</p><div class="archive-summary"><strong>19</strong><span>articles and research documents linked to 17 specimen records</span></div></article></div></section>
-<section id="stats" class="view hidden"><div class="page-title"><div><p class="eyebrow">Collection overview</p><h1>Statistics</h1><p>A snapshot of the catalog and photography progress.</p></div></div><div id="statCards" class="stat-cards"></div><div class="stat-cols"><article><h2>By category</h2><div id="categoryStats"></div></article><article><h2>By collection</h2><div id="ownerStats"></div></article></div></section>
-</main>
-<dialog id="detail"><button class="close">×</button><div id="detailBody"></div></dialog>
-<dialog id="editDialog" class="form-dialog"><button class="close-modal" data-close="editDialog">×</button><form id="editForm"><div class="form-head"><p class="eyebrow">Manage record</p><h2>Edit specimen</h2><p>Changes save directly to your private cloud account.</p></div><input type="hidden" name="id"><div class="form-grid"><label>Specimen number<input name="specimen_code" required pattern="[MF]-[0-9]{3}" title="Use M-### or F-###"></label><label>Name / Identification<input name="name" required></label><label>Locality<input name="locality"></label><label>Size<input name="size_class"></label><label>Color<input name="color"></label><label>Collection type<select name="collection_type" required><option>Minerals</option><option>Geodes & Agates</option><option>Fossils</option></select></label><label>Collection<select name="ownership_collection" required><option>Jane Freese Collection</option><option>Eric Page Collection</option></select></label><label>Status<select name="status"><option value="">Choose location…</option><option>Display Case 1</option><option>Display Case 2</option><option>Storage Box 1</option><option>Storage Box 2</option><option>Storage Box 3</option><option>Storage Box 4</option><option>Storage Box 5</option><option>Storage Box 6</option><option>Storage Box 7</option></select></label><label data-category-field="Minerals">Accessory minerals<input name="accessory_minerals"></label><label data-category-field="Minerals">Luster<input name="luster"></label><label data-category-field="Minerals">Formula<input name="formula"></label><label data-category-field="Minerals">Mineral group<input name="mineral_group"></label><label data-category-field="Minerals">Crystal system<input name="crystal_system"></label><label data-category-field="Fossils">Phylum<input name="phylum"></label><label data-category-field="Fossils">Class<input name="fossil_class"></label><label data-category-field="Fossils">Geological age<input name="geological_age"></label><label class="wide-field">Provenance<textarea name="provenance"></textarea></label><label class="wide-field">Notes<textarea name="notes"></textarea></label><label class="wide-field">Optional story<textarea name="story"></textarea></label></div><div class="form-actions"><button type="button" class="outline danger" id="deleteSpecimen">Delete Specimen</button><button type="button" class="outline" data-close="editDialog">Cancel</button><button class="primary dark-primary" type="submit">Save Changes</button></div></form></dialog>
-<dialog id="importDialog" class="form-dialog"><button class="close-modal" data-close="importDialog">×</button><form id="importForm"><div class="form-head"><p class="eyebrow">Add to the catalog</p><h2>Import a specimen</h2><p>The specimen number is assigned automatically from its collection type.</p></div><div class="form-grid"><label>Name / Identification<input name="name" required></label><label>Locality<input name="locality" required></label><label>Size<input name="size_class" required></label><label>Color<input name="color" required></label><label>Collection type<select name="collection_type" required><option>Minerals</option><option>Geodes & Agates</option><option>Fossils</option></select></label><label>Collection<select name="ownership_collection" required><option>Eric Page Collection</option><option>Jane Freese Collection</option></select></label><label>Status<select name="status" required><option value="">Choose location…</option><option>Display Case 1</option><option>Display Case 2</option><option>Storage Box 1</option><option>Storage Box 2</option><option>Storage Box 3</option><option>Storage Box 4</option><option>Storage Box 5</option><option>Storage Box 6</option><option>Storage Box 7</option></select></label><label data-category-field="Minerals">Accessory minerals<input name="accessory_minerals"></label><label data-category-field="Minerals">Luster<input name="luster"></label><label data-category-field="Minerals">Formula<input name="formula"></label><label data-category-field="Minerals">Mineral group<input name="mineral_group"></label><label data-category-field="Minerals">Crystal system<input name="crystal_system"></label><label data-category-field="Fossils">Phylum<input name="phylum"></label><label data-category-field="Fossils">Class<input name="fossil_class"></label><label data-category-field="Fossils">Geological age<input name="geological_age"></label><label class="wide-field">Notes<textarea name="notes"></textarea></label><label>Choose first photograph<input type="file" name="photo_file" accept="image/*"></label><label>Take first photograph<input type="file" name="camera_file" accept="image/*" capture="environment"></label></div><div class="preview-note">A photograph is optional. If provided, it is uploaded after the specimen is created and becomes the primary photograph.</div><div class="form-actions"><button type="button" class="outline" data-close="importDialog">Cancel</button><button class="primary dark-primary" type="submit">Add Specimen</button></div></form></dialog>
-<dialog id="attachmentDialog" class="form-dialog"><button class="close-modal" data-close="attachmentDialog">×</button><form id="attachmentForm"><div class="form-head"><p class="eyebrow">Related materials</p><h2>Add photos or documents</h2><p id="attachmentFor"></p></div><input type="hidden" name="id"><div class="form-grid"><label>Material type<select name="material_type"><option>Specimen photograph</option><option>Historical label</option><option>Article</option><option>Research document</option><option>Other document</option></select></label><label>Choose existing file<input type="file" name="file" accept="image/*,.pdf,.doc,.docx"></label><label>Take a photograph<input type="file" name="camera_file" accept="image/*" capture="environment"></label><label class="wide-field">Caption or note<textarea name="caption"></textarea></label></div><div class="preview-note">On a phone or iPad, Take a photograph can open the device camera. The selected file is uploaded to private cloud storage and becomes available across your signed-in devices.</div><div class="form-actions"><button type="button" class="outline" data-close="attachmentDialog">Cancel</button><button class="primary dark-primary" type="submit">Save Material</button></div></form></dialog>
-<dialog id="settingsDialog" class="form-dialog"><button class="close-modal" data-close="settingsDialog">×</button><div class="settings-panel"><div class="form-head"><p class="eyebrow">Application</p><h2>Settings, backup, and synchronization</h2><p>Your catalog and private media are stored in your owner cloud account and are available across signed-in devices.</p></div><div class="settings-actions"><button class="outline" id="fullBackup">Export Full Backup</button><button class="outline" id="migratePetrifiedWood" type="button">Move Petrified Wood to Fossils</button><button class="outline" id="installApp" hidden>Install App</button></div><section class="cloud-section"><h3>Private cloud</h3><p id="cloudStatus"></p><p id="lastSync" class="sync-meta"></p><div id="cloudMessage" class="cloud-message hidden" role="status"></div><form id="cloudLoginForm" class="cloud-login"><label>Email<input type="email" name="email" autocomplete="username"></label><label>Password<input type="password" name="password" autocomplete="current-password"></label><button class="primary dark-primary" type="submit">Sign In</button></form><div class="settings-actions"><button class="outline" id="cloudPush" type="button">Save All to Cloud</button><button class="outline" id="cloudSignOut" type="button">Sign Out</button></div></div></section></div></dialog><div id="authGate" class="auth-gate"><div class="auth-card"><div class="auth-mark">L</div><p class="eyebrow">Private collection</p><h1>Legacy in Stone</h1><p>Sign in with your owner account to open the collection.</p><form id="authLoginForm" class="auth-form"><label>Email<input type="email" name="email" autocomplete="username" required></label><label>Password<input type="password" name="password" autocomplete="current-password" required></label><button class="primary dark-primary" type="submit">Sign In</button></form><p id="authError" class="cloud-message hidden"></p></div></div><div id="toast" class="toast hidden"></div>
-<script src="app.js"></script><script src="storage.js"></script><script src="cloud-config.js"></script><script src="cloud.js"></script><script src="v06-enhancements.js"></script></body></html>
