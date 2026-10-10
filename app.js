@@ -36,7 +36,8 @@ We've picked some of our favorite calcites from the collection to show just how 
   slug:'garnet-family',
   title:'The Garnet Family',
   cover:'M-265',
-  specimenCodes:['M-265','M-297','M-316','M-398','M-384','M-311','M-012','M-011','M-009'],
+  coverImage:'photos/265-1.jpg',
+  specimenCodes:['M-265','M-297','M-316','M-398','M-384','M-311','M-012','M-011','M-009','M-008'],
   intro:`When you hear “garnet,” you probably picture a deep red crystal. But take a look at these! Garnets can be orange, green, raspberry pink, and almost black, and they grow in some wonderfully geometric shapes.
 
 These specimens come from quite a few different places and include several members of the garnet family. Some are big, bold crystals; others are tiny, sparkling clusters. A couple even look as though they belong to completely different minerals.
@@ -46,6 +47,7 @@ We picked this group because it's fun to see how much variety hides behind one f
   slug:'fluorite-world-of-color',
   title:'Fluorite: A World of Color',
   cover:'M-106',
+  coverImage:'photos/106.jpg',
   specimenCodes:['M-106','M-383','M-365','M-359','M-332','M-344','M-284','M-374','M-109','M-110','M-392'],
   intro:`Fluorite has a way of stealing the show. It turns up in beautiful shades of purple, green, blue, and yellow, sometimes with several colors in a single crystal. And those neat cubes aren't the only shapes it can make.
 
@@ -56,7 +58,8 @@ It's a fun reminder that the same mineral can look completely different dependin
   slug:'artistry-of-agate',
   title:'The Artistry of Agate',
   cover:'M-318',
-  specimenCodes:['M-318','M-152','M-063','M-086','M-100','M-101','M-167','M-176','M-209','M-253','M-279','M-280','M-326','M-355'],
+  coverImage:'photos/318.jpg',
+  specimenCodes:['M-318','M-152','M-063','M-086','M-100','M-101','M-167','M-176','M-209','M-253','M-279','M-280','M-355','M-039','M-041','M-060','M-313','M-292','M-281','M-192'],
   intro:`Some rocks are worth picking up just because they're beautiful. Agates are a perfect example! Their swirls, bands, colors, and unexpected little pockets can make each piece look like a miniature work of art.
 
 We've gathered some favorites from the collection, including colorful carnelian, delicate banding, unusual patterns, and agate-filled thunder eggs. Not every specimen looks like the classic striped agate, and that's part of the fun. Even pieces from similar places can be completely different.
@@ -66,7 +69,8 @@ This gallery isn't about choosing the rarest examples or giving a geology lesson
   slug:'brachiopods-ancient-iowa',
   title:'Brachiopods of Ancient Iowa',
   cover:'F-035',
-  specimenCodes:['F-007','F-016','F-019','F-025','F-030','F-032','F-035','F-132','F-014','F-027','F-031','F-034'],
+  coverImage:'fossil-photos/F-035.jpg',
+  specimenCodes:['F-007','F-016','F-019','F-025','F-030','F-032','F-035','F-014','F-027','F-031','F-034','F-023','F-026','F-029'],
   intro:`It's hard to imagine now, but much of Iowa was once covered by warm, shallow seas. Brachiopods were among the creatures living on those ancient sea floors, and Jane collected a wonderful assortment of their fossil shells.
 
 At first glance, a lot of brachiopods look alike. Look a little closer and you'll notice all kinds of differences: rounded shells, sharp folds, delicate ribs, and unusual outlines. Some are beautifully preserved, while others show just enough detail to hint at the animal that lived there millions of years ago.
@@ -76,6 +80,7 @@ These are some favorites from Iowa localities that meant a lot to Jane, especial
   slug:'ancient-seas-cephalopods',
   title:'Ancient Seas: Cephalopods',
   cover:'F-121',
+  coverImage:'fossil-photos/F-121.jpg',
   specimenCodes:['F-121','F-122','F-120','F-109','F-100','F-101','F-103','F-104','F-107','F-108','F-137'],
   intro:`Long before today's octopuses and squid, their cephalopod relatives were swimming through ancient seas in an astonishing assortment of shells. Some carried long, straight shells; others coiled theirs into tight spirals. A few left behind fossils that look almost like pieces of modern sculpture.
 
@@ -86,6 +91,7 @@ It's a wonderful group to browse simply for the shapes—and to imagine the stra
   slug:'diamonds-that-arent-diamonds',
   title:"Diamonds That Aren't Diamonds",
   cover:'M-199',
+  coverImage:'photos/199.jpg',
   specimenCodes:['M-199','M-061','M-193','M-320'],
   intro:`A diamond by any other name? Not quite! Rockhounds have a long tradition of giving the name “diamond” to crystals that sparkle, look gemmy, or simply come from a memorable collecting spot—even when they aren't diamonds at all.
 
