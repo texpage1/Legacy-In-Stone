@@ -47,12 +47,12 @@
 
 /* Cloud-backed specimen favorites */
 .card .photo{position:relative}
-.favorite-toggle{display:inline-flex;align-items:center;justify-content:center;gap:6px;width:48px;height:44px;padding:6px;border:1px solid #c8cec7;border-radius:12px;background:#fff;color:#65746b;cursor:pointer;flex-shrink:0}
-.favorite-toggle svg{width:32px;height:32px;display:block}
+.favorite-toggle{display:inline-flex;align-items:center;justify-content:center;gap:6px;width:38px;height:36px;padding:4px;border:1px solid #c8cec7;border-radius:12px;background:#fff;color:#65746b;cursor:pointer;flex-shrink:0}
+.favorite-toggle svg{width:25px;height:25px;display:block}
 .favorite-toggle.is-favorite{background:#f9e8bf;border-color:#c49b4b;color:#aa751d}
 .favorite-toggle:disabled{opacity:.45;cursor:wait}
-.favorite-toggle.favorite-small{position:absolute;top:10px;right:10px;z-index:2;width:42px;height:42px;box-shadow:0 2px 10px #0002}
-.favorite-toggle.favorite-small svg{width:29px;height:29px}
+.favorite-toggle.favorite-small{position:absolute;top:10px;right:10px;z-index:2;width:32px;height:32px;box-shadow:0 2px 10px #0002}
+.favorite-toggle.favorite-small svg{width:22px;height:22px}
 .favorites-cover{display:grid;place-items:center;background:#e5e8de}
 .favorites-cover>svg{width:76px;height:76px;color:#a87a32}
 .favorite-count{font:600 13px/1.2 system-ui,sans-serif;color:var(--muted)}
