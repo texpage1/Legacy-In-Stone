@@ -25,6 +25,7 @@ const specialGalleries=[{
   slug:'faces-of-calcite',
   title:'The Many Faces of Calcite',
   cover:'M-047',
+  coverImage:'photos/047-1.jpg',
   specimenCodes:['M-142','M-042','M-050','M-046','M-047','M-221','M-358','M-339','M-385','M-338','M-376','M-403','M-048','M-058'],
   intro:`Calcite might be one of the most common minerals around, but you'd never guess it from looking at these specimens! Some form sharp, pointed crystals, while others grow in delicate clusters, broad rhombs, or unusual shapes that hardly look like crystals at all.
 
@@ -34,7 +35,7 @@ We've picked some of our favorite calcites from the collection to show just how 
 }];
 let activeGallery=null;
 function galleryRecords(g){return g.specimenCodes.map(code=>data.find(x=>x.specimen_code===code)).filter(Boolean)}
-function galleryTile(g){const specimen=data.find(x=>x.specimen_code===g.cover),photo=specimen&&pic(specimen);return `<button class="gallery-tile" data-gallery="${esc(g.slug)}"><span class="gallery-tile-photo" ${photo?`style="background-image:url('${esc(photo.web_path)}')"`:''}></span><span class="gallery-tile-title">${esc(g.title)}</span></button>`}
+function galleryTile(g){const specimen=data.find(x=>x.specimen_code===g.cover),photo=specimen&&pic(specimen),src=g.coverImage||(photo&&photo.web_path);return `<button class="gallery-tile" data-gallery="${esc(g.slug)}"><span class="gallery-tile-photo">${src?`<img src="${esc(src)}" alt="${esc(g.title)} cover specimen" loading="lazy">`:''}</span><span class="gallery-tile-title">${esc(g.title)}</span></button>`}
 function renderGalleryTiles(){const tiles=specialGalleries.map(galleryTile).join('');$('#galleryTiles').innerHTML=tiles;$('#allGalleryTiles').innerHTML=tiles;$$('[data-gallery]').forEach(b=>b.onclick=()=>openSpecialGallery(b.dataset.gallery))}
 function openSpecialGallery(slug){const g=specialGalleries.find(g=>g.slug===slug);if(!g)return;activeGallery=g;$('#specialGalleryTitle').textContent=g.title;$('#specialGalleryIntro').textContent=g.intro;const specimens=galleryRecords(g);$('#galleryResultCount').textContent=`${specimens.length} selected specimens`;$('#specialGalleryGrid').innerHTML=specimens.map(card).join('');view('specialGallery');bind()}
 let featuredIds=[];

@@ -38,3 +38,9 @@
 .original-displays>p:last-child{line-height:1.65}
 @media(max-width:900px){.gallery-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:620px){.gallery-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.gallery-tile-title{font-size:17px;padding:11px}}
+
+/* Special Gallery pilot: consistent page gutters and a reliable photo element. */
+#galleries,#specialGallery{max-width:1280px;margin:0 auto;padding:72px clamp(24px,5vw,72px) 96px}
+.gallery-tile-photo{overflow:hidden}
+.gallery-tile-photo img{display:block;width:100%;height:100%;object-fit:cover}
+@media(max-width:620px){#galleries,#specialGallery{padding:36px 22px 64px}}
