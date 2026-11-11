@@ -56,3 +56,11 @@
 .favorites-cover{display:grid;place-items:center;background:#e5e8de}
 .favorites-cover>svg{width:76px;height:76px;color:#a87a32}
 .favorite-count{font:600 13px/1.2 system-ui,sans-serif;color:var(--muted)}
+
+/* About: keep both family photos together in the left column. */
+.jane-profile{align-items:start}
+.jane-photos{display:flex;flex-direction:column;gap:24px;min-width:0}
+.jane-photos>img{display:block;width:100%;height:auto;max-height:none;object-fit:contain;border-radius:18px}
+.jane-photos .cabinet-history{width:100%;max-width:none;margin:0}
+.jane-photos .cabinet-history img{display:block;width:100%;height:auto;max-height:none;object-fit:contain}
+@media(max-width:700px){.jane-profile{grid-template-columns:1fr}.jane-photos{max-width:440px}}
